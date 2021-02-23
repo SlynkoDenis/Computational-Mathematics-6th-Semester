@@ -19,7 +19,7 @@ class Main:
     @staticmethod
     def create_plots_dir(name="Plots"):
         if not os.path.isdir(os.path.join(os.path.dirname(sys.argv[0]), name)):
-            subprocess.check_output("mkdir Plots", shell=True)
+            subprocess.check_output(f"mkdir {name}", shell=True)
 
     def __sub_solve__(self, u_n, h, b, p):
         if p == 1:
@@ -71,8 +71,8 @@ class Main:
 
         return x_axis, u_values
 
-    def main(self, b, h=0.02):
-        Main.create_plots_dir()
+    def main(self, b, h=0.02, name="Plots"):
+        Main.create_plots_dir(name=name)
 
         fig = plt.figure()
 
@@ -80,18 +80,18 @@ class Main:
         x_axis4, u_values4 = self.solve(h, b, p=4)
 
         ax = fig.add_subplot(121)
-        ax.plot(x_axis, u_values[0], label='p = 1', marker='o')
-        ax.plot(x_axis4, u_values4[0], label='p = 4', marker='o')
-        ax.set_title("b = 2.0", fontsize=20)
+        ax.plot(x_axis, u_values[0], label='p = 1', marker='o', markersize=1)
+        ax.plot(x_axis4, u_values4[0], label='p = 4', marker='o', markersize=1)
+        ax.set_title(f"b = {b}", fontsize=20)
         ax.set_xlabel("x", fontsize=16)
         ax.set_ylabel("u", fontsize=16)
         ax.legend(fontsize=20)
         ax.grid()
 
         ax = fig.add_subplot(122)
-        ax.plot(x_axis, u_values[1], label='p = 1', marker='o')
-        ax.plot(x_axis4, u_values4[1], label='p = 4', marker='o')
-        ax.set_title("b = 2.0", fontsize=20)
+        ax.plot(x_axis, u_values[1], label='p = 1', marker='o', markersize=1)
+        ax.plot(x_axis4, u_values4[1], label='p = 4', marker='o', markersize=1)
+        ax.set_title(f"b = {b}", fontsize=20)
         ax.set_xlabel("x", fontsize=16)
         ax.set_ylabel("v", fontsize=16)
         ax.legend(fontsize=20)
@@ -99,13 +99,13 @@ class Main:
 
         fig.set_figheight(20)
         fig.set_figwidth(25)
-        fig.savefig(os.path.join("Plots", f"{str(b).replace('.', '_')}.png"))
+        fig.savefig(os.path.join(name, f"{str(b).replace('.', '_')}.png"))
 
         fig = plt.figure()
 
         ax = fig.add_subplot(111)
-        ax.plot(u_values[0], u_values[1], label='p = 1', marker='o')
-        ax.plot(u_values4[0], u_values4[1], label='p = 4', marker='o')
+        ax.plot(u_values[0], u_values[1], label='p = 1', marker='o', markersize=1)
+        ax.plot(u_values4[0], u_values4[1], label='p = 4', marker='o', markersize=1)
         ax.set_title(f"Phase for b = {b}", fontsize=20)
         ax.set_xlabel("u", fontsize=16)
         ax.set_ylabel("v", fontsize=16)
@@ -114,12 +114,12 @@ class Main:
 
         fig.set_figheight(20)
         fig.set_figwidth(25)
-        fig.savefig(os.path.join("Plots", f"Phase_{str(b).replace('.', '_')}.png"))
+        fig.savefig(os.path.join(name, f"Phase_{str(b).replace('.', '_')}.png"))
 
 
 if __name__ == '__main__':
     main = Main(10.0)
     b = 1.0
     while b <= 5.0:
-        main.main(b)
+        main.main(b, h=0.001, name="new")
         b += 0.5
