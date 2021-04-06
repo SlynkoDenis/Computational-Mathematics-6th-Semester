@@ -2,46 +2,44 @@ import numpy as np
 
 
 class Equation:
-    a = 0.0
-    b = 1.0
+    a = np.float64(0.0)
+    b = np.float64(1.0)
 
     @staticmethod
     def get_boundary_values():
-        return [(0.0, 1.0), (1.0, 0.0)]
+        return [(np.float64(0.0), np.float64(1.0)), (np.float64(1.0), np.float64(0.0))]
 
     @staticmethod
-    def exact_solution(x, e=0.01):
-        return -1.0 * e * np.log(x + np.exp(-1.0 / e) * (1 - x))
+    def exact_solution(x, e=np.float64(0.01)):
+        return -1.0 * e * np.log(x + np.exp(-1.0 / e) * (np.float64(1.0) - x))
 
 
 def shooting_method(n, epsilon, precision=0.001):
     bv = Equation.get_boundary_values()
-    right_bv = bv[1]
+    right_bv = bv[1][1]
 
-    def right_boundary_dev(right_y_value):
-        return right_y_value - right_bv[1]
+    def right_boundary_dev(right_y_value, rbv):
+        return right_y_value - rbv
 
-    step = 0.5
+    step = np.float64(0.001)
     while True:
         alpha1 = -1.0 * epsilon * (np.exp(1.0 / epsilon) - 1) + step
         tmp1 = get_auxiliary_solution(n, epsilon, alpha1)
-        dev1 = right_boundary_dev(tmp1[n - 1])
+        dev1 = right_boundary_dev(tmp1[n - 1], right_bv)
         if abs(dev1) < precision:
             return tmp1
 
         alpha2 = -1.0 * epsilon * (np.exp(1.0 / epsilon) - 1) - step
         tmp2 = get_auxiliary_solution(n, epsilon, alpha2)
-        dev2 = right_boundary_dev(tmp2[n - 1])
+        dev2 = right_boundary_dev(tmp2[n - 1], right_bv)
         if abs(dev2) < precision:
             return tmp2
 
         if dev1 * dev2 < 0.0:
             while True:
-                print(dev1, dev2)
                 alpha = (alpha1 + alpha2) / 2
                 tmp = get_auxiliary_solution(n, epsilon, alpha)
-                print(f"In iteration right boundary equals {tmp[n - 1]}")
-                dev = right_boundary_dev(tmp[n - 1])
+                dev = right_boundary_dev(tmp[n - 1], right_bv)
                 if abs(dev) < precision:
                     return tmp
 
@@ -52,8 +50,8 @@ def shooting_method(n, epsilon, precision=0.001):
                 else:
                     print("Unforeseen!")
         else:
+            step *= 10.0
             print(f"Step equals {step}")
-            step += 0.1
 
 
 def get_auxiliary_solution(n, epsilon, alpha):
@@ -65,10 +63,9 @@ def get_auxiliary_solution(n, epsilon, alpha):
     y[1] = y[0] + alpha * h
     for i in range(2, n):
         b = y[i - 2] + 2.0 * epsilon
-        c = y[i - 2] * y[i - 2] + 8.0 * epsilon * y[i - 1] - 4.0 * epsilon * y[i - 2]
-        print(f"D = {b * b - c}")
-        y1 = b - np.sqrt(b * b - c)
-        y2 = b + np.sqrt(b * b - c)
+        d = 4.0 * epsilon * (epsilon + 2.0 * y[i - 2] - 2.0 * y[i - 1])
+        y1 = b - np.sqrt(d)
+        y2 = b + np.sqrt(d)
         if abs(y[i - 1] - y1) < abs(y[i - 1] - y2):
             y[i] = y1
         else:

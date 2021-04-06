@@ -26,9 +26,10 @@ for i in range(N - 2, -1, -1):
     u[i] = r[i] - p[i] * u[i + 1]
 x = np.arange(0.0, N * h, step=h, dtype=float)
 
+print(f"The solution for {N} points")
+print(u)
 
 fig = plt.figure()
-
 ax = fig.add_subplot(111)
 ax.plot(x, u, marker='o', markersize=3)
 ax.set_title("Tridiagonal matrix solution", fontsize=20)
